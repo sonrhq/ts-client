@@ -4,7 +4,7 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient, DeliverTxResponse } from "@cosmjs/stargate";
 import { EncodeObject, GeneratedType, OfflineSigner, Registry } from "@cosmjs/proto-signing";
 import { msgTypes } from './registry';
-import { IgniteClient } from "../client"
+import { SonrClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 
@@ -50,8 +50,8 @@ interface TxClientOptions {
 export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "http://localhost:26657", prefix: "cosmos" }) => {
 
   return {
-		
-		
+
+
 	}
 };
 
@@ -69,9 +69,9 @@ class SDKModule {
 	public structure: Record<string,unknown>;
 	public registry: Array<[string, GeneratedType]> = [];
 
-	constructor(client: IgniteClient) {		
-	
-		this.query = queryClient({ addr: client.env.apiURL });		
+	constructor(client: SonrClient) {
+
+		this.query = queryClient({ addr: client.env.apiURL });
 		this.updateTX(client);
 		this.structure =  {
 						IdentifiedClientState: getStructure(typeIdentifiedClientState.fromPartial({})),
@@ -83,19 +83,19 @@ class SDKModule {
 						Params: getStructure(typeParams.fromPartial({})),
 						GenesisMetadata: getStructure(typeGenesisMetadata.fromPartial({})),
 						IdentifiedGenesisMetadata: getStructure(typeIdentifiedGenesisMetadata.fromPartial({})),
-						
+
 		};
-		client.on('signer-changed',(signer) => {			
+		client.on('signer-changed',(signer) => {
 		 this.updateTX(client);
 		})
 	}
-	updateTX(client: IgniteClient) {
+	updateTX(client: SonrClient) {
     const methods = txClient({
         signer: client.signer,
         addr: client.env.rpcURL,
         prefix: client.env.prefix ?? "cosmos",
     })
-	
+
     this.tx = methods;
     for (let m in methods) {
         this.tx[m] = methods[m].bind(this.tx);
@@ -103,7 +103,7 @@ class SDKModule {
 	}
 };
 
-const Module = (test: IgniteClient) => {
+const Module = (test: SonrClient) => {
 	return {
 		module: {
 			IbcCoreClientV1: new SDKModule(test)

@@ -4,7 +4,7 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient, DeliverTxResponse } from "@cosmjs/stargate";
 import { EncodeObject, GeneratedType, OfflineSigner, Registry } from "@cosmjs/proto-signing";
 import { msgTypes } from './registry';
-import { IgniteClient } from "../client"
+import { SonrClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 import { MsgVerifyInvariant } from "./types/cosmos/crisis/v1beta1/tx";
@@ -52,13 +52,13 @@ interface TxClientOptions {
 export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "http://localhost:26657", prefix: "cosmos" }) => {
 
   return {
-		
+
 		async sendMsgVerifyInvariant({ value, fee, memo }: sendMsgVerifyInvariantParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgVerifyInvariant: Unable to sign Tx. Signer is not present.')
 			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
+			try {
+				const { address } = (await signer.getAccounts())[0];
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
 				let msg = this.msgVerifyInvariant({ value: MsgVerifyInvariant.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
@@ -66,16 +66,16 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				throw new Error('TxClient:sendMsgVerifyInvariant: Could not broadcast Tx: '+ e.message)
 			}
 		},
-		
-		
+
+
 		msgVerifyInvariant({ value }: msgVerifyInvariantParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.crisis.v1beta1.MsgVerifyInvariant", value: MsgVerifyInvariant.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.crisis.v1beta1.MsgVerifyInvariant", value: MsgVerifyInvariant.fromPartial( value ) }
 			} catch (e: any) {
 				throw new Error('TxClient:MsgVerifyInvariant: Could not create message: ' + e.message)
 			}
 		},
-		
+
 	}
 };
 
@@ -93,24 +93,24 @@ class SDKModule {
 	public structure: Record<string,unknown>;
 	public registry: Array<[string, GeneratedType]> = [];
 
-	constructor(client: IgniteClient) {		
-	
-		this.query = queryClient({ addr: client.env.apiURL });		
+	constructor(client: SonrClient) {
+
+		this.query = queryClient({ addr: client.env.apiURL });
 		this.updateTX(client);
 		this.structure =  {
-						
+
 		};
-		client.on('signer-changed',(signer) => {			
+		client.on('signer-changed',(signer) => {
 		 this.updateTX(client);
 		})
 	}
-	updateTX(client: IgniteClient) {
+	updateTX(client: SonrClient) {
     const methods = txClient({
         signer: client.signer,
         addr: client.env.rpcURL,
         prefix: client.env.prefix ?? "cosmos",
     })
-	
+
     this.tx = methods;
     for (let m in methods) {
         this.tx[m] = methods[m].bind(this.tx);
@@ -118,7 +118,7 @@ class SDKModule {
 	}
 };
 
-const Module = (test: IgniteClient) => {
+const Module = (test: SonrClient) => {
 	return {
 		module: {
 			CosmosCrisisV1Beta1: new SDKModule(test)

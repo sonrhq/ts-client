@@ -4,7 +4,7 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient, DeliverTxResponse } from "@cosmjs/stargate";
 import { EncodeObject, GeneratedType, OfflineSigner, Registry } from "@cosmjs/proto-signing";
 import { msgTypes } from './registry';
-import { IgniteClient } from "../client"
+import { SonrClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 import { MsgCreateVestingAccount } from "./types/cosmos/vesting/v1beta1/tx";
@@ -80,13 +80,13 @@ interface TxClientOptions {
 export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "http://localhost:26657", prefix: "cosmos" }) => {
 
   return {
-		
+
 		async sendMsgCreateVestingAccount({ value, fee, memo }: sendMsgCreateVestingAccountParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgCreateVestingAccount: Unable to sign Tx. Signer is not present.')
 			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
+			try {
+				const { address } = (await signer.getAccounts())[0];
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
 				let msg = this.msgCreateVestingAccount({ value: MsgCreateVestingAccount.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
@@ -94,13 +94,13 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				throw new Error('TxClient:sendMsgCreateVestingAccount: Could not broadcast Tx: '+ e.message)
 			}
 		},
-		
+
 		async sendMsgCreatePermanentLockedAccount({ value, fee, memo }: sendMsgCreatePermanentLockedAccountParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgCreatePermanentLockedAccount: Unable to sign Tx. Signer is not present.')
 			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
+			try {
+				const { address } = (await signer.getAccounts())[0];
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
 				let msg = this.msgCreatePermanentLockedAccount({ value: MsgCreatePermanentLockedAccount.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
@@ -108,13 +108,13 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				throw new Error('TxClient:sendMsgCreatePermanentLockedAccount: Could not broadcast Tx: '+ e.message)
 			}
 		},
-		
+
 		async sendMsgCreatePeriodicVestingAccount({ value, fee, memo }: sendMsgCreatePeriodicVestingAccountParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgCreatePeriodicVestingAccount: Unable to sign Tx. Signer is not present.')
 			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
+			try {
+				const { address } = (await signer.getAccounts())[0];
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
 				let msg = this.msgCreatePeriodicVestingAccount({ value: MsgCreatePeriodicVestingAccount.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
@@ -122,32 +122,32 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				throw new Error('TxClient:sendMsgCreatePeriodicVestingAccount: Could not broadcast Tx: '+ e.message)
 			}
 		},
-		
-		
+
+
 		msgCreateVestingAccount({ value }: msgCreateVestingAccountParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.vesting.v1beta1.MsgCreateVestingAccount", value: MsgCreateVestingAccount.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.vesting.v1beta1.MsgCreateVestingAccount", value: MsgCreateVestingAccount.fromPartial( value ) }
 			} catch (e: any) {
 				throw new Error('TxClient:MsgCreateVestingAccount: Could not create message: ' + e.message)
 			}
 		},
-		
+
 		msgCreatePermanentLockedAccount({ value }: msgCreatePermanentLockedAccountParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePermanentLockedAccount", value: MsgCreatePermanentLockedAccount.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePermanentLockedAccount", value: MsgCreatePermanentLockedAccount.fromPartial( value ) }
 			} catch (e: any) {
 				throw new Error('TxClient:MsgCreatePermanentLockedAccount: Could not create message: ' + e.message)
 			}
 		},
-		
+
 		msgCreatePeriodicVestingAccount({ value }: msgCreatePeriodicVestingAccountParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount", value: MsgCreatePeriodicVestingAccount.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount", value: MsgCreatePeriodicVestingAccount.fromPartial( value ) }
 			} catch (e: any) {
 				throw new Error('TxClient:MsgCreatePeriodicVestingAccount: Could not create message: ' + e.message)
 			}
 		},
-		
+
 	}
 };
 
@@ -165,9 +165,9 @@ class SDKModule {
 	public structure: Record<string,unknown>;
 	public registry: Array<[string, GeneratedType]> = [];
 
-	constructor(client: IgniteClient) {		
-	
-		this.query = queryClient({ addr: client.env.apiURL });		
+	constructor(client: SonrClient) {
+
+		this.query = queryClient({ addr: client.env.apiURL });
 		this.updateTX(client);
 		this.structure =  {
 						BaseVestingAccount: getStructure(typeBaseVestingAccount.fromPartial({})),
@@ -176,19 +176,19 @@ class SDKModule {
 						Period: getStructure(typePeriod.fromPartial({})),
 						PeriodicVestingAccount: getStructure(typePeriodicVestingAccount.fromPartial({})),
 						PermanentLockedAccount: getStructure(typePermanentLockedAccount.fromPartial({})),
-						
+
 		};
-		client.on('signer-changed',(signer) => {			
+		client.on('signer-changed',(signer) => {
 		 this.updateTX(client);
 		})
 	}
-	updateTX(client: IgniteClient) {
+	updateTX(client: SonrClient) {
     const methods = txClient({
         signer: client.signer,
         addr: client.env.rpcURL,
         prefix: client.env.prefix ?? "cosmos",
     })
-	
+
     this.tx = methods;
     for (let m in methods) {
         this.tx[m] = methods[m].bind(this.tx);
@@ -196,7 +196,7 @@ class SDKModule {
 	}
 };
 
-const Module = (test: IgniteClient) => {
+const Module = (test: SonrClient) => {
 	return {
 		module: {
 			CosmosVestingV1Beta1: new SDKModule(test)

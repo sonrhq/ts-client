@@ -4,7 +4,7 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient, DeliverTxResponse } from "@cosmjs/stargate";
 import { EncodeObject, GeneratedType, OfflineSigner, Registry } from "@cosmjs/proto-signing";
 import { msgTypes } from './registry';
-import { IgniteClient } from "../client"
+import { SonrClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 import { MsgCancelUpgrade } from "./types/cosmos/upgrade/v1beta1/tx";
@@ -67,13 +67,13 @@ interface TxClientOptions {
 export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "http://localhost:26657", prefix: "cosmos" }) => {
 
   return {
-		
+
 		async sendMsgCancelUpgrade({ value, fee, memo }: sendMsgCancelUpgradeParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgCancelUpgrade: Unable to sign Tx. Signer is not present.')
 			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
+			try {
+				const { address } = (await signer.getAccounts())[0];
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
 				let msg = this.msgCancelUpgrade({ value: MsgCancelUpgrade.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
@@ -81,13 +81,13 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				throw new Error('TxClient:sendMsgCancelUpgrade: Could not broadcast Tx: '+ e.message)
 			}
 		},
-		
+
 		async sendMsgSoftwareUpgrade({ value, fee, memo }: sendMsgSoftwareUpgradeParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgSoftwareUpgrade: Unable to sign Tx. Signer is not present.')
 			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
+			try {
+				const { address } = (await signer.getAccounts())[0];
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
 				let msg = this.msgSoftwareUpgrade({ value: MsgSoftwareUpgrade.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
@@ -95,24 +95,24 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				throw new Error('TxClient:sendMsgSoftwareUpgrade: Could not broadcast Tx: '+ e.message)
 			}
 		},
-		
-		
+
+
 		msgCancelUpgrade({ value }: msgCancelUpgradeParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.upgrade.v1beta1.MsgCancelUpgrade", value: MsgCancelUpgrade.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.upgrade.v1beta1.MsgCancelUpgrade", value: MsgCancelUpgrade.fromPartial( value ) }
 			} catch (e: any) {
 				throw new Error('TxClient:MsgCancelUpgrade: Could not create message: ' + e.message)
 			}
 		},
-		
+
 		msgSoftwareUpgrade({ value }: msgSoftwareUpgradeParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade", value: MsgSoftwareUpgrade.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade", value: MsgSoftwareUpgrade.fromPartial( value ) }
 			} catch (e: any) {
 				throw new Error('TxClient:MsgSoftwareUpgrade: Could not create message: ' + e.message)
 			}
 		},
-		
+
 	}
 };
 
@@ -130,28 +130,28 @@ class SDKModule {
 	public structure: Record<string,unknown>;
 	public registry: Array<[string, GeneratedType]> = [];
 
-	constructor(client: IgniteClient) {		
-	
-		this.query = queryClient({ addr: client.env.apiURL });		
+	constructor(client: SonrClient) {
+
+		this.query = queryClient({ addr: client.env.apiURL });
 		this.updateTX(client);
 		this.structure =  {
 						Plan: getStructure(typePlan.fromPartial({})),
 						SoftwareUpgradeProposal: getStructure(typeSoftwareUpgradeProposal.fromPartial({})),
 						CancelSoftwareUpgradeProposal: getStructure(typeCancelSoftwareUpgradeProposal.fromPartial({})),
 						ModuleVersion: getStructure(typeModuleVersion.fromPartial({})),
-						
+
 		};
-		client.on('signer-changed',(signer) => {			
+		client.on('signer-changed',(signer) => {
 		 this.updateTX(client);
 		})
 	}
-	updateTX(client: IgniteClient) {
+	updateTX(client: SonrClient) {
     const methods = txClient({
         signer: client.signer,
         addr: client.env.rpcURL,
         prefix: client.env.prefix ?? "cosmos",
     })
-	
+
     this.tx = methods;
     for (let m in methods) {
         this.tx[m] = methods[m].bind(this.tx);
@@ -159,7 +159,7 @@ class SDKModule {
 	}
 };
 
-const Module = (test: IgniteClient) => {
+const Module = (test: SonrClient) => {
 	return {
 		module: {
 			CosmosUpgradeV1Beta1: new SDKModule(test)

@@ -1,24 +1,20 @@
-/// <reference path="./types.d.ts" />
-import {
-  GeneratedType,
-  OfflineSigner,
-  EncodeObject,
-  Registry,
-} from "@cosmjs/proto-signing";
 import { StdFee } from "@cosmjs/launchpad";
+/// <reference path="./types.d.ts" />
+import { EncodeObject, GeneratedType, OfflineSigner, Registry } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
-import { Env } from "./env";
-import { UnionToIntersection, Return, Constructor } from "./helpers";
-import { Module } from "./modules";
-import { EventEmitter } from "events";
 import { ChainInfo } from "@keplr-wallet/types";
+import { EventEmitter } from "events";
+
+import { Env } from "./env";
+import { Constructor, Return, UnionToIntersection } from "./helpers";
+import { Module } from "./modules";
 
 const defaultFee = {
   amount: [],
   gas: "200000",
 };
 
-export class IgniteClient extends EventEmitter {
+export class SonrClient extends EventEmitter {
 	static plugins: Module[] = [];
   env: Env;
   signer?: OfflineSigner;
@@ -32,11 +28,11 @@ export class IgniteClient extends EventEmitter {
 
     if (Array.isArray(plugin)) {
       type Extension = UnionToIntersection<Return<T>['module']>
-      return AugmentedClient as typeof IgniteClient & Constructor<Extension>;  
+      return AugmentedClient as typeof SonrClient & Constructor<Extension>;
     }
 
     type Extension = Return<T>['module']
-    return AugmentedClient as typeof IgniteClient & Constructor<Extension>;
+    return AugmentedClient as typeof SonrClient & Constructor<Extension>;
   }
 
   async signAndBroadcast(msgs: EncodeObject[], fee: StdFee, memo: string) {
@@ -54,20 +50,20 @@ export class IgniteClient extends EventEmitter {
     this.env = env;
     this.setMaxListeners(0);
     this.signer = signer;
-    const classConstructor = this.constructor as typeof IgniteClient;
+    const classConstructor = this.constructor as typeof SonrClient;
     classConstructor.plugins.forEach(plugin => {
       const pluginInstance = plugin(this);
       Object.assign(this, pluginInstance.module)
       if (this.registry) {
         this.registry = this.registry.concat(pluginInstance.registry)
       }
-		});		
+		});
   }
-  useSigner(signer: OfflineSigner) {    
+  useSigner(signer: OfflineSigner) {
       this.signer = signer;
       this.emit("signer-changed", this.signer);
   }
-  removeSigner() {    
+  removeSigner() {
       this.signer = undefined;
       this.emit("signer-changed", this.signer);
   }
