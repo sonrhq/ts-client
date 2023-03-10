@@ -387,7 +387,7 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * Package Motor is used for defining a Motor node and its properties.
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class VaultApi<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *

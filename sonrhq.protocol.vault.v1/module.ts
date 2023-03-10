@@ -6,7 +6,7 @@ import { EncodeObject, GeneratedType, OfflineSigner, Registry } from "@cosmjs/pr
 import { msgTypes } from './registry';
 import { SonrClient } from "../client"
 import { MissingWalletError } from "../helpers"
-import { Api } from "./rest";
+import { VaultApi } from "./rest";
 
 import { AccountInfo as typeAccountInfo} from "./types"
 import { AccountConfig as typeAccountConfig} from "./types"
@@ -54,7 +54,7 @@ interface QueryClientOptions {
 }
 
 export const queryClient = ({ addr: addr }: QueryClientOptions = { addr: "http://localhost:1317" }) => {
-  return new Api({ baseURL: addr });
+  return new VaultApi({ baseURL: addr });
 };
 
 class SDKModule {

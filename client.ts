@@ -14,11 +14,19 @@ const defaultFee = {
   gas: "200000",
 };
 
+let defaultEnv = {
+  rpcURL: "https//rpc.sonr.ws",
+  apiURL: "https://api.sonr.ws",
+  prefix: "snr",
+};
+
 export class SonrClient extends EventEmitter {
 	static plugins: Module[] = [];
   env: Env;
   signer?: OfflineSigner;
   registry: Array<[string, GeneratedType]> = [];
+
+  // plugin adds a plugin to the client
   static plugin<T extends Module | Module[]>(plugin: T) {
     const currentPlugins = this.plugins;
 
@@ -35,19 +43,10 @@ export class SonrClient extends EventEmitter {
     return AugmentedClient as typeof SonrClient & Constructor<Extension>;
   }
 
-  async signAndBroadcast(msgs: EncodeObject[], fee: StdFee, memo: string) {
-    if (this.signer) {
-      const { address } = (await this.signer.getAccounts())[0];
-      const signingClient = await SigningStargateClient.connectWithSigner(this.env.rpcURL, this.signer, { registry: new Registry(this.registry), prefix: this.env.prefix });
-      return await signingClient.signAndBroadcast(address, msgs, fee ? fee : defaultFee, memo)
-    } else {
-      throw new Error(" Signer is not present.");
-    }
-  }
-
-  constructor(env: Env, signer?: OfflineSigner) {
+  // constructor creates a new client
+  constructor(signer?: OfflineSigner) {
     super();
-    this.env = env;
+    this.env = defaultEnv;
     this.setMaxListeners(0);
     this.signer = signer;
     const classConstructor = this.constructor as typeof SonrClient;
@@ -59,14 +58,33 @@ export class SonrClient extends EventEmitter {
       }
 		});
   }
+
+
+  // signAndBroadcast signs and broadcasts a transaction
+  async signAndBroadcast(msgs: EncodeObject[], fee: StdFee, memo: string) {
+    if (this.signer) {
+      const { address } = (await this.signer.getAccounts())[0];
+      const signingClient = await SigningStargateClient.connectWithSigner(this.env.rpcURL, this.signer, { registry: new Registry(this.registry), prefix: this.env.prefix });
+      return await signingClient.signAndBroadcast(address, msgs, fee ? fee : defaultFee, memo)
+    } else {
+      throw new Error(" Signer is not present.");
+    }
+  }
+
+
+  // useSigner sets the signer to the client
   useSigner(signer: OfflineSigner) {
       this.signer = signer;
       this.emit("signer-changed", this.signer);
   }
+
+  // removeSigner removes the signer from the client
   removeSigner() {
       this.signer = undefined;
       this.emit("signer-changed", this.signer);
   }
+
+  // useKeplr is a helper function to suggest a chain to Keplr extension
   async useKeplr(keplrChainInfo: Partial<ChainInfo> = {}) {
     // Using queryClients directly because BaseClient has no knowledge of the modules at this stage
     try {
@@ -145,14 +163,17 @@ export class SonrClient extends EventEmitter {
           coinType,
           ...keplrChainInfo,
         };
-        await window.keplr.experimentalSuggestChain(suggestOptions);
 
+        if(typeof window !== "undefined") {
+
+        await window.keplr.experimentalSuggestChain(suggestOptions);
         window.keplr.defaultOptions = {
-          sign: {
-            preferNoSetFee: true,
-            preferNoSetMemo: true,
-          },
-        };
+            sign: {
+              preferNoSetFee: true,
+              preferNoSetMemo: true,
+            },
+          };
+        }
       }
       await window.keplr.enable(chainId);
       this.signer = window.keplr.getOfflineSigner(chainId);
