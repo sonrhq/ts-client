@@ -6,7 +6,7 @@ import { KeyValuePair } from "./types/core/identity/v1/did"
 import { Params } from "./types/core/identity/v1/genesis"
 
 
-export {     
+export {
     DidDocument,
     VerificationMethod,
     VerificationRelationship,
