@@ -123,18 +123,22 @@ export interface V1QueryAllServiceResponse {
 }
 
 export interface V1QueryDidByAlsoKnownAsResponse {
+  /** A DIDDocument is a JSON-LD object that contains a set of public keys */
   didDocument?: V1DidDocument;
 }
 
 export interface V1QueryDidByKeyIDResponse {
+  /** A DIDDocument is a JSON-LD object that contains a set of public keys */
   didDocument?: V1DidDocument;
 }
 
 export interface V1QueryGetDidResponse {
+  /** A DIDDocument is a JSON-LD object that contains a set of public keys */
   didDocument?: V1DidDocument;
 }
 
 export interface V1QueryGetServiceResponse {
+  /** A Service is a JSON-LD object that contains relaying information to authenticate a client */
   service?: V1Service;
 }
 
@@ -374,16 +378,18 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title core/identity/v1/did.proto
+ * @title Sonr API
  * @version version not set
+ *
+ * Sonr is a peer-to-peer identity and asset management system that leverages DID documents, Webauthn, and IPFS — providing users with a secure, user-friendly way to manage their digital identity and assets.
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags Query
    * @name QueryDidAll
-   * @summary Queries a list of DidDocument items.
+   * @summary Get All DIDDocuments
    * @request GET:/sonr/core/identity/did
    */
   queryDidAll = (
@@ -405,11 +411,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags Query
    * @name QueryDidByAlsoKnownAs
-   * @summary Queries a DIDDocument for the matching AlsoKnownAs
+   * @summary Get a DIDDocument from an Alias
    * @request GET:/sonr/core/identity/did/aka/{aka_id}
    */
   queryDidByAlsoKnownAs = (akaId: string, params: RequestParams = {}) =>
@@ -421,11 +427,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags Query
    * @name QueryDidByKeyId
-   * @summary Queries a DIDDocument for the matching key
+   * @summary Get a DIDDocument from a key id
    * @request GET:/sonr/core/identity/did/key/{key_id}
    */
   queryDidByKeyID = (keyId: string, params: RequestParams = {}) =>
@@ -437,11 +443,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags Query
    * @name QueryDid
-   * @summary Queries a DidDocument by index.
+   * @summary Get a DIDDocument by DID
    * @request GET:/sonr/core/identity/did/{did}
    */
   queryDid = (did: string, params: RequestParams = {}) =>
@@ -453,11 +459,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags Query
    * @name QueryParams
-   * @summary Parameters queries the parameters of the module.
+   * @summary Parameters for the identity module.
    * @request GET:/sonr/core/identity/params
    */
   queryParams = (params: RequestParams = {}) =>
@@ -469,11 +475,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags Query
    * @name QueryServiceAll
-   * @summary Queries a DIDDocument for the matching service
+   * @summary Get all Services
    * @request GET:/sonr/core/identity/service
    */
   queryServiceAll = (
@@ -495,11 +501,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags Query
    * @name QueryService
-   * @summary Queries a DIDDocument for the matching service
+   * @summary Get a Service from Origin
    * @request GET:/sonr/core/identity/service/{origin}
    */
   queryService = (origin: string, params: RequestParams = {}) =>

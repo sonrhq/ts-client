@@ -9,21 +9,10 @@
  * ---------------------------------------------------------------
  */
 
-export interface ProtobufAny {
-  "@type"?: string;
-}
-
-export interface RpcStatus {
-  /** @format int32 */
-  code?: number;
-  message?: string;
-  details?: ProtobufAny[];
-}
-
 /**
  * Account is used for storing all credentials and their locations to be encrypted.
  */
-export interface V1AccountInfo {
+export interface CommonAccountInfo {
   /** Address is the associated Sonr address. */
   address?: string;
 
@@ -46,6 +35,17 @@ export interface V1AccountInfo {
   balance?: number;
 }
 
+export interface ProtobufAny {
+  "@type"?: string;
+}
+
+export interface RpcStatus {
+  /** @format int32 */
+  code?: number;
+  message?: string;
+  details?: ProtobufAny[];
+}
+
 /**
  * CreateAccountResponse is the response to a CreateAccount request.
  */
@@ -53,7 +53,7 @@ export interface V1CreateAccountResponse {
   success?: boolean;
   coin_type?: string;
   did_document?: V1DidDocument;
-  accounts?: V1AccountInfo[];
+  accounts?: CommonAccountInfo[];
 }
 
 /**
@@ -62,7 +62,7 @@ export interface V1CreateAccountResponse {
 export interface V1DeleteAccountResponse {
   success?: boolean;
   did_document?: V1DidDocument;
-  accounts?: V1AccountInfo[];
+  accounts?: CommonAccountInfo[];
 }
 
 export interface V1DidDocument {
@@ -106,7 +106,7 @@ export interface V1DidDocument {
 export interface V1GetAccountResponse {
   success?: boolean;
   coin_type?: string;
-  accounts?: V1AccountInfo[];
+  accounts?: CommonAccountInfo[];
 }
 
 export interface V1KeyValuePair {
@@ -119,29 +119,49 @@ export interface V1KeyValuePair {
  */
 export interface V1ListAccountsResponse {
   success?: boolean;
-  accounts?: V1AccountInfo[];
+  accounts?: CommonAccountInfo[];
 }
 
 /**
  * LoginFinishRequest is the request to login to an account.
  */
 export interface V1LoginFinishRequest {
+  /** Address of the account to login to. */
   account_address?: string;
+
+  /** The signed credential response from the user. */
   credential_response?: string;
+
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
+  origin?: string;
 }
 
 /**
  * LoginFinishResponse is the response to a Login request.
  */
 export interface V1LoginFinishResponse {
+  /** Success is true if the account exists. */
   success?: boolean;
+
+  /** The account address for the user. */
   account_address?: string;
+
+  /** Relaying party id for the request. */
+  rp_id?: string;
+
+  /** Relaying party name for the request. */
+  rp_name?: string;
+
+  /** The DID Document for the wallet. */
   did_document?: V1DidDocument;
 
-  /** Account is used for storing all credentials and their locations to be encrypted. */
-  account_info?: V1AccountInfo;
+  /** The account info for the wallet. */
+  account_info?: CommonAccountInfo;
 
-  /** @format byte */
+  /**
+   * The UCAN token authorization header for subsequent requests.
+   * @format byte
+   */
   ucan_token_header?: string;
 }
 
@@ -149,7 +169,10 @@ export interface V1LoginFinishResponse {
  * LoginStartRequest is the request to login to an account.
  */
 export interface V1LoginStartRequest {
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
   origin?: string;
+
+  /** The Sonr account address for the user. */
   account_address?: string;
 }
 
@@ -157,10 +180,20 @@ export interface V1LoginStartRequest {
  * LoginStartResponse is the response to a Login request.
  */
 export interface V1LoginStartResponse {
+  /** Success is true if the account exists. */
   success?: boolean;
+
+  /** The account address for the user. */
   account_address?: string;
-  aka?: string;
+
+  /** Json encoded WebAuthn credential options for the user to sign with. */
   credential_options?: string;
+
+  /** Relaying party id for the request. */
+  rp_id?: string;
+
+  /** Relaying party name for the request. */
+  rp_name?: string;
 }
 
 /**
@@ -185,23 +218,45 @@ export interface V1RefreshSharesResponse {
  * RegisterFinishRequest is the request to CreateAccount a new key from the private key.
  */
 export interface V1RegisterFinishRequest {
-  session_id?: string;
+  /** The previously generated session id. */
+  uuid?: string;
+
+  /** The signed credential response from the user. */
   credential_response?: string;
+
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
+  origin?: string;
 }
 
 /**
  * RegisterFinishResponse is the response to a CreateAccount request.
  */
 export interface V1RegisterFinishResponse {
-  /** @format byte */
+  /**
+   * The id of the account.
+   * @format byte
+   */
   id?: string;
+
+  /** The address of the account. */
   address?: string;
+
+  /** Relaying party id for the request. */
+  rp_id?: string;
+
+  /** Relaying party name for the request. */
+  rp_name?: string;
+
+  /** The DID Document for the wallet. */
   did_document?: V1DidDocument;
 
-  /** Account is used for storing all credentials and their locations to be encrypted. */
-  account_info?: V1AccountInfo;
+  /** The account info for the wallet. */
+  account_info?: CommonAccountInfo;
 
-  /** @format byte */
+  /**
+   * The UCAN token authorization header for subsequent requests.
+   * @format byte
+   */
   ucan_token_header?: string;
 }
 
@@ -209,12 +264,22 @@ export interface V1RegisterFinishResponse {
  * RegisterStartRequest is the request to register a new account.
  */
 export interface V1RegisterStartRequest {
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
   origin?: string;
+
+  /** The user defined label for the device. */
   device_label?: string;
 
-  /** @format int32 */
+  /**
+   * The security threshold for the wallet account.
+   * @format int32
+   */
   security_threshold?: number;
+
+  /** The recovery passcode for the wallet account. */
   passcode?: string;
+
+  /** The Unique Identifier for the client device. Typically in a cookie. */
   uuid?: string;
 }
 
@@ -222,8 +287,14 @@ export interface V1RegisterStartRequest {
  * RegisterStartResponse is the response to a Register request.
  */
 export interface V1RegisterStartResponse {
+  /** Credential options for the user to sign with WebAuthn. */
   creation_options?: string;
-  session_id?: string;
+
+  /** Relaying party id for the request. */
+  rp_id?: string;
+
+  /** Relaying party name for the request. */
+  rp_name?: string;
 }
 
 export interface V1Service {
@@ -382,18 +453,18 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title protocol/vault/v1/accounts.proto
+ * @title sonr/vault/v1/accounts.proto
  * @version version not set
  *
  * Package Motor is used for defining a Motor node and its properties.
  */
-export class VaultApi<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAccounts
    * @name VaultAccountsListAccounts
-   * @summary ListAccounts lists the accounts and returns the configuration.
+   * @summary List the accounts
    * @request GET:/sonr/vault/accounts/{sonr_id}
    */
   vaultAccountsListAccounts = (sonrId: string, params: RequestParams = {}) =>
@@ -405,11 +476,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAccounts
    * @name VaultAccountsCreateAccount
-   * @summary CreateAccount creates the account and returns the configuration.
+   * @summary Create a new account
    * @request POST:/sonr/vault/accounts/{sonr_id}/create
    */
   vaultAccountsCreateAccount = (sonrId: string, body: { coin_type?: string }, params: RequestParams = {}) =>
@@ -423,11 +494,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAccounts
    * @name VaultAccountsGetAccount
-   * @summary GetAccount gets the account and returns the configuration.
+   * @summary Get Account
    * @request GET:/sonr/vault/accounts/{sonr_id}/{coin_type}
    */
   vaultAccountsGetAccount = (sonrId: string, coinType: string, params: RequestParams = {}) =>
@@ -439,11 +510,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAccounts
    * @name VaultAccountsDeleteAccount
-   * @summary DeleteAccount deletes the account and returns the configuration.
+   * @summary Delete Account
    * @request POST:/sonr/vault/accounts/{target_did}/delete
    */
   vaultAccountsDeleteAccount = (targetDid: string, body: { sonr_id?: string }, params: RequestParams = {}) =>
@@ -457,11 +528,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAuthentication
    * @name VaultAuthenticationLoginFinish
-   * @summary LoginFinish finishes the login process and returns the account info.
+   * @summary Login Finish
    * @request POST:/sonr/vault/auth/login/finish
    */
   vaultAuthenticationLoginFinish = (body: V1LoginFinishRequest, params: RequestParams = {}) =>
@@ -475,11 +546,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAuthentication
    * @name VaultAuthenticationLoginStart
-   * @summary LoginStart starts the login process and returns the credential options.
+   * @summary Login Start
    * @request POST:/sonr/vault/auth/login/start
    */
   vaultAuthenticationLoginStart = (body: V1LoginStartRequest, params: RequestParams = {}) =>
@@ -493,11 +564,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAuthentication
    * @name VaultAuthenticationRegisterFinish
-   * @summary RegisterFinish creates a new Bip32 child key and returns the configuration.
+   * @summary Register Finish
    * @request POST:/sonr/vault/auth/register/finish
    */
   vaultAuthenticationRegisterFinish = (body: V1RegisterFinishRequest, params: RequestParams = {}) =>
@@ -511,11 +582,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultAuthentication
    * @name VaultAuthenticationRegisterStart
-   * @summary RegisterStart creates a new Webauthn credential and returns it.
+   * @summary Register Start
    * @request POST:/sonr/vault/auth/register/start
    */
   vaultAuthenticationRegisterStart = (body: V1RegisterStartRequest, params: RequestParams = {}) =>
@@ -529,11 +600,11 @@ export class VaultApi<SecurityDataType extends unknown> extends HttpClient<Secur
     });
 
   /**
-   * No description
+   * @description {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service. It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}". #### {{.RequestType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .RequestType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}} #### {{.ResponseType.Name}} | Name | Type | Description | | ---- | ---- | ----------- |{{range .ResponseType.Fields}} | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
    *
    * @tags VaultStorage
    * @name VaultStorageRefreshShares
-   * @summary RefreshShares refreshes the Wallet shares and returns the updated configuration.
+   * @summary Refresh Shares
    * @request POST:/sonr/vault/storage/refresh
    */
   vaultStorageRefreshShares = (body: V1RefreshSharesRequest, params: RequestParams = {}) =>

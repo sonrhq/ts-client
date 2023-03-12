@@ -17,26 +17,32 @@ export interface QueryParamsResponse {
 }
 
 export interface QueryGetDidRequest {
+  /** did is the unique identifier of the DIDDocument - it appears like (did:sonr:...) */
   did: string;
 }
 
 export interface QueryGetDidResponse {
+  /** A DIDDocument is a JSON-LD object that contains a set of public keys */
   didDocument: DidDocument | undefined;
 }
 
 export interface QueryDidByKeyIDRequest {
+  /** key_id is the unique identifier of the DIDDocument - it appears like (did:sonr:...#key-1) */
   keyId: string;
 }
 
 export interface QueryDidByKeyIDResponse {
+  /** A DIDDocument is a JSON-LD object that contains a set of public keys */
   didDocument: DidDocument | undefined;
 }
 
 export interface QueryDidByAlsoKnownAsRequest {
+  /** aka_id is the unique identifier of the DIDDocument - it appears like ("example.snr") */
   akaId: string;
 }
 
 export interface QueryDidByAlsoKnownAsResponse {
+  /** A DIDDocument is a JSON-LD object that contains a set of public keys */
   didDocument: DidDocument | undefined;
 }
 
@@ -50,10 +56,12 @@ export interface QueryAllDidResponse {
 }
 
 export interface QueryGetServiceRequest {
+  /** origin is the hostname of the calling service - it appears like ("test.com") */
   origin: string;
 }
 
 export interface QueryGetServiceResponse {
+  /** A Service is a JSON-LD object that contains relaying information to authenticate a client */
   service: Service | undefined;
 }
 
@@ -777,19 +785,124 @@ export const QueryAllServiceResponse = {
 
 /** Query defines the gRPC querier service. */
 export interface Query {
-  /** Parameters queries the parameters of the module. */
+  /**
+   * Parameters for the identity module.
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
-  /** Queries a DidDocument by index. */
+  /**
+   * Get a DIDDocument by DID
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   Did(request: QueryGetDidRequest): Promise<QueryGetDidResponse>;
-  /** Queries a DIDDocument for the matching key */
+  /**
+   * Get a DIDDocument from a key id
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   DidByKeyID(request: QueryDidByKeyIDRequest): Promise<QueryDidByKeyIDResponse>;
-  /** Queries a DIDDocument for the matching AlsoKnownAs */
+  /**
+   * Get a DIDDocument from an Alias
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   DidByAlsoKnownAs(request: QueryDidByAlsoKnownAsRequest): Promise<QueryDidByAlsoKnownAsResponse>;
-  /** Queries a list of DidDocument items. */
+  /**
+   * Get All DIDDocuments
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   DidAll(request: QueryAllDidRequest): Promise<QueryAllDidResponse>;
-  /** Queries a DIDDocument for the matching service */
+  /**
+   * Get a Service from Origin
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   Service(request: QueryGetServiceRequest): Promise<QueryGetServiceResponse>;
-  /** Queries a DIDDocument for the matching service */
+  /**
+   * Get all Services
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   ServiceAll(request: QueryAllServiceRequest): Promise<QueryAllServiceResponse>;
 }
 

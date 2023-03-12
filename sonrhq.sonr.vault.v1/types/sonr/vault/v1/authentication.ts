@@ -1,66 +1,117 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { DidDocument } from "../../../core/identity/v1/did";
-import { AccountInfo } from "./models";
+import { AccountInfo } from "../../common/info";
 
-export const protobufPackage = "sonrhq.protocol.vault.v1";
+export const protobufPackage = "sonrhq.sonr.vault.v1";
 
 /** RegisterStartRequest is the request to register a new account. */
 export interface RegisterStartRequest {
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
   origin: string;
+  /** The user defined label for the device. */
   deviceLabel: string;
+  /** The security threshold for the wallet account. */
   securityThreshold: number;
+  /** The recovery passcode for the wallet account. */
   passcode: string;
+  /** The Unique Identifier for the client device. Typically in a cookie. */
   uuid: string;
 }
 
 /** RegisterStartResponse is the response to a Register request. */
 export interface RegisterStartResponse {
+  /** Credential options for the user to sign with WebAuthn. */
   creationOptions: string;
-  sessionId: string;
+  /** Relaying party id for the request. */
+  rpId: string;
+  /** Relaying party name for the request. */
+  rpName: string;
 }
 
 /** RegisterFinishRequest is the request to CreateAccount a new key from the private key. */
 export interface RegisterFinishRequest {
-  sessionId: string;
+  /** The previously generated session id. */
+  uuid: string;
+  /** The signed credential response from the user. */
   credentialResponse: string;
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
+  origin: string;
 }
 
 /** RegisterFinishResponse is the response to a CreateAccount request. */
 export interface RegisterFinishResponse {
+  /** The id of the account. */
   id: Uint8Array;
+  /** The address of the account. */
   address: string;
-  didDocument: DidDocument | undefined;
-  accountInfo: AccountInfo | undefined;
+  /** Relaying party id for the request. */
+  rpId: string;
+  /** Relaying party name for the request. */
+  rpName: string;
+  /** The DID Document for the wallet. */
+  didDocument:
+    | DidDocument
+    | undefined;
+  /** The account info for the wallet. */
+  accountInfo:
+    | AccountInfo
+    | undefined;
+  /** The UCAN token authorization header for subsequent requests. */
   ucanTokenHeader: Uint8Array;
 }
 
 /** LoginStartRequest is the request to login to an account. */
 export interface LoginStartRequest {
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
   origin: string;
+  /** The Sonr account address for the user. */
   accountAddress: string;
 }
 
 /** LoginStartResponse is the response to a Login request. */
 export interface LoginStartResponse {
+  /** Success is true if the account exists. */
   success: boolean;
+  /** The account address for the user. */
   accountAddress: string;
-  aka: string;
+  /** Json encoded WebAuthn credential options for the user to sign with. */
   credentialOptions: string;
+  /** Relaying party id for the request. */
+  rpId: string;
+  /** Relaying party name for the request. */
+  rpName: string;
 }
 
 /** LoginFinishRequest is the request to login to an account. */
 export interface LoginFinishRequest {
+  /** Address of the account to login to. */
   accountAddress: string;
+  /** The signed credential response from the user. */
   credentialResponse: string;
+  /** The origin of the request. This is used to query the Blockchain for the Service DID. */
+  origin: string;
 }
 
 /** LoginFinishResponse is the response to a Login request. */
 export interface LoginFinishResponse {
+  /** Success is true if the account exists. */
   success: boolean;
+  /** The account address for the user. */
   accountAddress: string;
-  didDocument: DidDocument | undefined;
-  accountInfo: AccountInfo | undefined;
+  /** Relaying party id for the request. */
+  rpId: string;
+  /** Relaying party name for the request. */
+  rpName: string;
+  /** The DID Document for the wallet. */
+  didDocument:
+    | DidDocument
+    | undefined;
+  /** The account info for the wallet. */
+  accountInfo:
+    | AccountInfo
+    | undefined;
+  /** The UCAN token authorization header for subsequent requests. */
   ucanTokenHeader: Uint8Array;
 }
 
@@ -150,7 +201,7 @@ export const RegisterStartRequest = {
 };
 
 function createBaseRegisterStartResponse(): RegisterStartResponse {
-  return { creationOptions: "", sessionId: "" };
+  return { creationOptions: "", rpId: "", rpName: "" };
 }
 
 export const RegisterStartResponse = {
@@ -158,8 +209,11 @@ export const RegisterStartResponse = {
     if (message.creationOptions !== "") {
       writer.uint32(10).string(message.creationOptions);
     }
-    if (message.sessionId !== "") {
-      writer.uint32(18).string(message.sessionId);
+    if (message.rpId !== "") {
+      writer.uint32(18).string(message.rpId);
+    }
+    if (message.rpName !== "") {
+      writer.uint32(26).string(message.rpName);
     }
     return writer;
   },
@@ -175,7 +229,10 @@ export const RegisterStartResponse = {
           message.creationOptions = reader.string();
           break;
         case 2:
-          message.sessionId = reader.string();
+          message.rpId = reader.string();
+          break;
+        case 3:
+          message.rpName = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -188,36 +245,42 @@ export const RegisterStartResponse = {
   fromJSON(object: any): RegisterStartResponse {
     return {
       creationOptions: isSet(object.creationOptions) ? String(object.creationOptions) : "",
-      sessionId: isSet(object.sessionId) ? String(object.sessionId) : "",
+      rpId: isSet(object.rpId) ? String(object.rpId) : "",
+      rpName: isSet(object.rpName) ? String(object.rpName) : "",
     };
   },
 
   toJSON(message: RegisterStartResponse): unknown {
     const obj: any = {};
     message.creationOptions !== undefined && (obj.creationOptions = message.creationOptions);
-    message.sessionId !== undefined && (obj.sessionId = message.sessionId);
+    message.rpId !== undefined && (obj.rpId = message.rpId);
+    message.rpName !== undefined && (obj.rpName = message.rpName);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<RegisterStartResponse>, I>>(object: I): RegisterStartResponse {
     const message = createBaseRegisterStartResponse();
     message.creationOptions = object.creationOptions ?? "";
-    message.sessionId = object.sessionId ?? "";
+    message.rpId = object.rpId ?? "";
+    message.rpName = object.rpName ?? "";
     return message;
   },
 };
 
 function createBaseRegisterFinishRequest(): RegisterFinishRequest {
-  return { sessionId: "", credentialResponse: "" };
+  return { uuid: "", credentialResponse: "", origin: "" };
 }
 
 export const RegisterFinishRequest = {
   encode(message: RegisterFinishRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.sessionId !== "") {
-      writer.uint32(10).string(message.sessionId);
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
     }
     if (message.credentialResponse !== "") {
       writer.uint32(18).string(message.credentialResponse);
+    }
+    if (message.origin !== "") {
+      writer.uint32(26).string(message.origin);
     }
     return writer;
   },
@@ -230,10 +293,13 @@ export const RegisterFinishRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.sessionId = reader.string();
+          message.uuid = reader.string();
           break;
         case 2:
           message.credentialResponse = reader.string();
+          break;
+        case 3:
+          message.origin = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -245,22 +311,25 @@ export const RegisterFinishRequest = {
 
   fromJSON(object: any): RegisterFinishRequest {
     return {
-      sessionId: isSet(object.sessionId) ? String(object.sessionId) : "",
+      uuid: isSet(object.uuid) ? String(object.uuid) : "",
       credentialResponse: isSet(object.credentialResponse) ? String(object.credentialResponse) : "",
+      origin: isSet(object.origin) ? String(object.origin) : "",
     };
   },
 
   toJSON(message: RegisterFinishRequest): unknown {
     const obj: any = {};
-    message.sessionId !== undefined && (obj.sessionId = message.sessionId);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
     message.credentialResponse !== undefined && (obj.credentialResponse = message.credentialResponse);
+    message.origin !== undefined && (obj.origin = message.origin);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<RegisterFinishRequest>, I>>(object: I): RegisterFinishRequest {
     const message = createBaseRegisterFinishRequest();
-    message.sessionId = object.sessionId ?? "";
+    message.uuid = object.uuid ?? "";
     message.credentialResponse = object.credentialResponse ?? "";
+    message.origin = object.origin ?? "";
     return message;
   },
 };
@@ -269,6 +338,8 @@ function createBaseRegisterFinishResponse(): RegisterFinishResponse {
   return {
     id: new Uint8Array(),
     address: "",
+    rpId: "",
+    rpName: "",
     didDocument: undefined,
     accountInfo: undefined,
     ucanTokenHeader: new Uint8Array(),
@@ -283,14 +354,20 @@ export const RegisterFinishResponse = {
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
     }
+    if (message.rpId !== "") {
+      writer.uint32(26).string(message.rpId);
+    }
+    if (message.rpName !== "") {
+      writer.uint32(34).string(message.rpName);
+    }
     if (message.didDocument !== undefined) {
-      DidDocument.encode(message.didDocument, writer.uint32(26).fork()).ldelim();
+      DidDocument.encode(message.didDocument, writer.uint32(42).fork()).ldelim();
     }
     if (message.accountInfo !== undefined) {
-      AccountInfo.encode(message.accountInfo, writer.uint32(34).fork()).ldelim();
+      AccountInfo.encode(message.accountInfo, writer.uint32(50).fork()).ldelim();
     }
     if (message.ucanTokenHeader.length !== 0) {
-      writer.uint32(42).bytes(message.ucanTokenHeader);
+      writer.uint32(58).bytes(message.ucanTokenHeader);
     }
     return writer;
   },
@@ -309,12 +386,18 @@ export const RegisterFinishResponse = {
           message.address = reader.string();
           break;
         case 3:
-          message.didDocument = DidDocument.decode(reader, reader.uint32());
+          message.rpId = reader.string();
           break;
         case 4:
-          message.accountInfo = AccountInfo.decode(reader, reader.uint32());
+          message.rpName = reader.string();
           break;
         case 5:
+          message.didDocument = DidDocument.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.accountInfo = AccountInfo.decode(reader, reader.uint32());
+          break;
+        case 7:
           message.ucanTokenHeader = reader.bytes();
           break;
         default:
@@ -329,6 +412,8 @@ export const RegisterFinishResponse = {
     return {
       id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(),
       address: isSet(object.address) ? String(object.address) : "",
+      rpId: isSet(object.rpId) ? String(object.rpId) : "",
+      rpName: isSet(object.rpName) ? String(object.rpName) : "",
       didDocument: isSet(object.didDocument) ? DidDocument.fromJSON(object.didDocument) : undefined,
       accountInfo: isSet(object.accountInfo) ? AccountInfo.fromJSON(object.accountInfo) : undefined,
       ucanTokenHeader: isSet(object.ucanTokenHeader) ? bytesFromBase64(object.ucanTokenHeader) : new Uint8Array(),
@@ -339,6 +424,8 @@ export const RegisterFinishResponse = {
     const obj: any = {};
     message.id !== undefined && (obj.id = base64FromBytes(message.id !== undefined ? message.id : new Uint8Array()));
     message.address !== undefined && (obj.address = message.address);
+    message.rpId !== undefined && (obj.rpId = message.rpId);
+    message.rpName !== undefined && (obj.rpName = message.rpName);
     message.didDocument !== undefined
       && (obj.didDocument = message.didDocument ? DidDocument.toJSON(message.didDocument) : undefined);
     message.accountInfo !== undefined
@@ -354,6 +441,8 @@ export const RegisterFinishResponse = {
     const message = createBaseRegisterFinishResponse();
     message.id = object.id ?? new Uint8Array();
     message.address = object.address ?? "";
+    message.rpId = object.rpId ?? "";
+    message.rpName = object.rpName ?? "";
     message.didDocument = (object.didDocument !== undefined && object.didDocument !== null)
       ? DidDocument.fromPartial(object.didDocument)
       : undefined;
@@ -424,7 +513,7 @@ export const LoginStartRequest = {
 };
 
 function createBaseLoginStartResponse(): LoginStartResponse {
-  return { success: false, accountAddress: "", aka: "", credentialOptions: "" };
+  return { success: false, accountAddress: "", credentialOptions: "", rpId: "", rpName: "" };
 }
 
 export const LoginStartResponse = {
@@ -435,11 +524,14 @@ export const LoginStartResponse = {
     if (message.accountAddress !== "") {
       writer.uint32(18).string(message.accountAddress);
     }
-    if (message.aka !== "") {
-      writer.uint32(26).string(message.aka);
-    }
     if (message.credentialOptions !== "") {
-      writer.uint32(34).string(message.credentialOptions);
+      writer.uint32(26).string(message.credentialOptions);
+    }
+    if (message.rpId !== "") {
+      writer.uint32(34).string(message.rpId);
+    }
+    if (message.rpName !== "") {
+      writer.uint32(42).string(message.rpName);
     }
     return writer;
   },
@@ -458,10 +550,13 @@ export const LoginStartResponse = {
           message.accountAddress = reader.string();
           break;
         case 3:
-          message.aka = reader.string();
+          message.credentialOptions = reader.string();
           break;
         case 4:
-          message.credentialOptions = reader.string();
+          message.rpId = reader.string();
+          break;
+        case 5:
+          message.rpName = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -475,8 +570,9 @@ export const LoginStartResponse = {
     return {
       success: isSet(object.success) ? Boolean(object.success) : false,
       accountAddress: isSet(object.accountAddress) ? String(object.accountAddress) : "",
-      aka: isSet(object.aka) ? String(object.aka) : "",
       credentialOptions: isSet(object.credentialOptions) ? String(object.credentialOptions) : "",
+      rpId: isSet(object.rpId) ? String(object.rpId) : "",
+      rpName: isSet(object.rpName) ? String(object.rpName) : "",
     };
   },
 
@@ -484,8 +580,9 @@ export const LoginStartResponse = {
     const obj: any = {};
     message.success !== undefined && (obj.success = message.success);
     message.accountAddress !== undefined && (obj.accountAddress = message.accountAddress);
-    message.aka !== undefined && (obj.aka = message.aka);
     message.credentialOptions !== undefined && (obj.credentialOptions = message.credentialOptions);
+    message.rpId !== undefined && (obj.rpId = message.rpId);
+    message.rpName !== undefined && (obj.rpName = message.rpName);
     return obj;
   },
 
@@ -493,14 +590,15 @@ export const LoginStartResponse = {
     const message = createBaseLoginStartResponse();
     message.success = object.success ?? false;
     message.accountAddress = object.accountAddress ?? "";
-    message.aka = object.aka ?? "";
     message.credentialOptions = object.credentialOptions ?? "";
+    message.rpId = object.rpId ?? "";
+    message.rpName = object.rpName ?? "";
     return message;
   },
 };
 
 function createBaseLoginFinishRequest(): LoginFinishRequest {
-  return { accountAddress: "", credentialResponse: "" };
+  return { accountAddress: "", credentialResponse: "", origin: "" };
 }
 
 export const LoginFinishRequest = {
@@ -510,6 +608,9 @@ export const LoginFinishRequest = {
     }
     if (message.credentialResponse !== "") {
       writer.uint32(18).string(message.credentialResponse);
+    }
+    if (message.origin !== "") {
+      writer.uint32(26).string(message.origin);
     }
     return writer;
   },
@@ -527,6 +628,9 @@ export const LoginFinishRequest = {
         case 2:
           message.credentialResponse = reader.string();
           break;
+        case 3:
+          message.origin = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -539,6 +643,7 @@ export const LoginFinishRequest = {
     return {
       accountAddress: isSet(object.accountAddress) ? String(object.accountAddress) : "",
       credentialResponse: isSet(object.credentialResponse) ? String(object.credentialResponse) : "",
+      origin: isSet(object.origin) ? String(object.origin) : "",
     };
   },
 
@@ -546,6 +651,7 @@ export const LoginFinishRequest = {
     const obj: any = {};
     message.accountAddress !== undefined && (obj.accountAddress = message.accountAddress);
     message.credentialResponse !== undefined && (obj.credentialResponse = message.credentialResponse);
+    message.origin !== undefined && (obj.origin = message.origin);
     return obj;
   },
 
@@ -553,6 +659,7 @@ export const LoginFinishRequest = {
     const message = createBaseLoginFinishRequest();
     message.accountAddress = object.accountAddress ?? "";
     message.credentialResponse = object.credentialResponse ?? "";
+    message.origin = object.origin ?? "";
     return message;
   },
 };
@@ -561,6 +668,8 @@ function createBaseLoginFinishResponse(): LoginFinishResponse {
   return {
     success: false,
     accountAddress: "",
+    rpId: "",
+    rpName: "",
     didDocument: undefined,
     accountInfo: undefined,
     ucanTokenHeader: new Uint8Array(),
@@ -575,14 +684,20 @@ export const LoginFinishResponse = {
     if (message.accountAddress !== "") {
       writer.uint32(18).string(message.accountAddress);
     }
+    if (message.rpId !== "") {
+      writer.uint32(26).string(message.rpId);
+    }
+    if (message.rpName !== "") {
+      writer.uint32(34).string(message.rpName);
+    }
     if (message.didDocument !== undefined) {
-      DidDocument.encode(message.didDocument, writer.uint32(26).fork()).ldelim();
+      DidDocument.encode(message.didDocument, writer.uint32(42).fork()).ldelim();
     }
     if (message.accountInfo !== undefined) {
-      AccountInfo.encode(message.accountInfo, writer.uint32(34).fork()).ldelim();
+      AccountInfo.encode(message.accountInfo, writer.uint32(50).fork()).ldelim();
     }
     if (message.ucanTokenHeader.length !== 0) {
-      writer.uint32(42).bytes(message.ucanTokenHeader);
+      writer.uint32(58).bytes(message.ucanTokenHeader);
     }
     return writer;
   },
@@ -601,12 +716,18 @@ export const LoginFinishResponse = {
           message.accountAddress = reader.string();
           break;
         case 3:
-          message.didDocument = DidDocument.decode(reader, reader.uint32());
+          message.rpId = reader.string();
           break;
         case 4:
-          message.accountInfo = AccountInfo.decode(reader, reader.uint32());
+          message.rpName = reader.string();
           break;
         case 5:
+          message.didDocument = DidDocument.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.accountInfo = AccountInfo.decode(reader, reader.uint32());
+          break;
+        case 7:
           message.ucanTokenHeader = reader.bytes();
           break;
         default:
@@ -621,6 +742,8 @@ export const LoginFinishResponse = {
     return {
       success: isSet(object.success) ? Boolean(object.success) : false,
       accountAddress: isSet(object.accountAddress) ? String(object.accountAddress) : "",
+      rpId: isSet(object.rpId) ? String(object.rpId) : "",
+      rpName: isSet(object.rpName) ? String(object.rpName) : "",
       didDocument: isSet(object.didDocument) ? DidDocument.fromJSON(object.didDocument) : undefined,
       accountInfo: isSet(object.accountInfo) ? AccountInfo.fromJSON(object.accountInfo) : undefined,
       ucanTokenHeader: isSet(object.ucanTokenHeader) ? bytesFromBase64(object.ucanTokenHeader) : new Uint8Array(),
@@ -631,6 +754,8 @@ export const LoginFinishResponse = {
     const obj: any = {};
     message.success !== undefined && (obj.success = message.success);
     message.accountAddress !== undefined && (obj.accountAddress = message.accountAddress);
+    message.rpId !== undefined && (obj.rpId = message.rpId);
+    message.rpName !== undefined && (obj.rpName = message.rpName);
     message.didDocument !== undefined
       && (obj.didDocument = message.didDocument ? DidDocument.toJSON(message.didDocument) : undefined);
     message.accountInfo !== undefined
@@ -646,6 +771,8 @@ export const LoginFinishResponse = {
     const message = createBaseLoginFinishResponse();
     message.success = object.success ?? false;
     message.accountAddress = object.accountAddress ?? "";
+    message.rpId = object.rpId ?? "";
+    message.rpName = object.rpName ?? "";
     message.didDocument = (object.didDocument !== undefined && object.didDocument !== null)
       ? DidDocument.fromPartial(object.didDocument)
       : undefined;
@@ -659,13 +786,73 @@ export const LoginFinishResponse = {
 
 /** Vault is the service used for managing a node's keypair. */
 export interface VaultAuthentication {
-  /** LoginStart starts the login process and returns the credential options. */
+  /**
+   * Login Start
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   LoginStart(request: LoginStartRequest): Promise<LoginStartResponse>;
-  /** LoginFinish finishes the login process and returns the account info. */
+  /**
+   * Login Finish
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   LoginFinish(request: LoginFinishRequest): Promise<LoginFinishResponse>;
-  /** RegisterStart creates a new Webauthn credential and returns it. */
+  /**
+   * Register Start
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   RegisterStart(request: RegisterStartRequest): Promise<RegisterStartResponse>;
-  /** RegisterFinish creates a new Bip32 child key and returns the configuration. */
+  /**
+   * Register Finish
+   *
+   * {{.MethodDescriptorProto.Name}} is a call with the method(s) {{$first := true}}{{range .Bindings}}{{if $first}}{{$first = false}}{{else}}, {{end}}{{.HTTPMethod}}{{end}} within the "{{.Service.Name}}" service.
+   * It takes in "{{.RequestType.Name}}" and returns a "{{.ResponseType.Name}}".
+   *
+   * #### {{.RequestType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .RequestType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   *
+   * #### {{.ResponseType.Name}}
+   * | Name | Type | Description |
+   * | ---- | ---- | ----------- |{{range .ResponseType.Fields}}
+   * | {{.Name}} | {{if eq .Label.String "LABEL_REPEATED"}}[]{{end}}{{.Type}} | {{fieldcomments .Message .}} | {{end}}
+   */
   RegisterFinish(request: RegisterFinishRequest): Promise<RegisterFinishResponse>;
 }
 
@@ -680,25 +867,25 @@ export class VaultAuthenticationClientImpl implements VaultAuthentication {
   }
   LoginStart(request: LoginStartRequest): Promise<LoginStartResponse> {
     const data = LoginStartRequest.encode(request).finish();
-    const promise = this.rpc.request("sonrhq.protocol.vault.v1.VaultAuthentication", "LoginStart", data);
+    const promise = this.rpc.request("sonrhq.sonr.vault.v1.VaultAuthentication", "LoginStart", data);
     return promise.then((data) => LoginStartResponse.decode(new _m0.Reader(data)));
   }
 
   LoginFinish(request: LoginFinishRequest): Promise<LoginFinishResponse> {
     const data = LoginFinishRequest.encode(request).finish();
-    const promise = this.rpc.request("sonrhq.protocol.vault.v1.VaultAuthentication", "LoginFinish", data);
+    const promise = this.rpc.request("sonrhq.sonr.vault.v1.VaultAuthentication", "LoginFinish", data);
     return promise.then((data) => LoginFinishResponse.decode(new _m0.Reader(data)));
   }
 
   RegisterStart(request: RegisterStartRequest): Promise<RegisterStartResponse> {
     const data = RegisterStartRequest.encode(request).finish();
-    const promise = this.rpc.request("sonrhq.protocol.vault.v1.VaultAuthentication", "RegisterStart", data);
+    const promise = this.rpc.request("sonrhq.sonr.vault.v1.VaultAuthentication", "RegisterStart", data);
     return promise.then((data) => RegisterStartResponse.decode(new _m0.Reader(data)));
   }
 
   RegisterFinish(request: RegisterFinishRequest): Promise<RegisterFinishResponse> {
     const data = RegisterFinishRequest.encode(request).finish();
-    const promise = this.rpc.request("sonrhq.protocol.vault.v1.VaultAuthentication", "RegisterFinish", data);
+    const promise = this.rpc.request("sonrhq.sonr.vault.v1.VaultAuthentication", "RegisterFinish", data);
     return promise.then((data) => RegisterFinishResponse.decode(new _m0.Reader(data)));
   }
 }

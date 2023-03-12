@@ -17,6 +17,7 @@ const defaultFee = {
 let defaultEnv = {
   rpcURL: "https//rpc.sonr.ws",
   apiURL: "https://api.sonr.ws",
+  grpcURL: "142.93.116.204:9090",
   prefix: "snr",
 };
 
@@ -173,11 +174,13 @@ export class SonrClient extends EventEmitter {
               preferNoSetMemo: true,
             },
           };
-        }
-      }
-      await window.keplr.enable(chainId);
+
+                await window.keplr.enable(chainId);
       this.signer = window.keplr.getOfflineSigner(chainId);
       this.emit("signer-changed", this.signer);
+        }
+      }
+
     } catch (e) {
       throw new Error(
         "Could not load tendermint, staking and bank modules. Please ensure your client loads them to use useKeplr()"

@@ -3,6 +3,63 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "sonrhq.core.identity.v1";
 
+/** DIDMethod is the DID method for each supported resolver. */
+export enum DIDMethod {
+  /** DIDMethod_BLOCKCHAIN - DID method for the Sonr network */
+  DIDMethod_BLOCKCHAIN = 0,
+  /** DIDMethod_WEB - DID method for the Ethereum network */
+  DIDMethod_WEB = 1,
+  /** DIDMethod_KEY - DID method for the Cosmos network */
+  DIDMethod_KEY = 2,
+  /** DIDMethod_IPFS - DID method for the Filecoin network */
+  DIDMethod_IPFS = 3,
+  /** DIDMethod_PEER - DID method for the Handshake network */
+  DIDMethod_PEER = 4,
+  UNRECOGNIZED = -1,
+}
+
+export function dIDMethodFromJSON(object: any): DIDMethod {
+  switch (object) {
+    case 0:
+    case "DIDMethod_BLOCKCHAIN":
+      return DIDMethod.DIDMethod_BLOCKCHAIN;
+    case 1:
+    case "DIDMethod_WEB":
+      return DIDMethod.DIDMethod_WEB;
+    case 2:
+    case "DIDMethod_KEY":
+      return DIDMethod.DIDMethod_KEY;
+    case 3:
+    case "DIDMethod_IPFS":
+      return DIDMethod.DIDMethod_IPFS;
+    case 4:
+    case "DIDMethod_PEER":
+      return DIDMethod.DIDMethod_PEER;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return DIDMethod.UNRECOGNIZED;
+  }
+}
+
+export function dIDMethodToJSON(object: DIDMethod): string {
+  switch (object) {
+    case DIDMethod.DIDMethod_BLOCKCHAIN:
+      return "DIDMethod_BLOCKCHAIN";
+    case DIDMethod.DIDMethod_WEB:
+      return "DIDMethod_WEB";
+    case DIDMethod.DIDMethod_KEY:
+      return "DIDMethod_KEY";
+    case DIDMethod.DIDMethod_IPFS:
+      return "DIDMethod_IPFS";
+    case DIDMethod.DIDMethod_PEER:
+      return "DIDMethod_PEER";
+    case DIDMethod.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface DidDocument {
   context: string[];
   id: string;
